@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KuliahKita — Papan Tugas Kanban & Bot Pengingat WhatsApp</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#111827" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body class="text-zinc-900 min-h-screen antialiased selection:bg-indigo-600 selection:text-white">
+
+  <!-- ========================================================= -->
+  <!-- 1. STICKY NAVBAR                                          -->
+  <!-- ========================================================= -->
+  <header class="sticky top-0 z-30 bg-[#FAF9F6]/85 backdrop-blur-md border-b border-zinc-200/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-extrabold text-xs tracking-tight shadow-sm">
+          KK
+        </div>
+        <span class="font-extrabold text-lg text-zinc-950 tracking-tight">KuliahKita</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-7 text-xs font-bold text-zinc-600">
+        <a href="#cara-kerja" class="hover:text-zinc-950 transition">Cara Kerja</a>
+        <a href="#perbandingan" class="hover:text-zinc-950 transition">Kenapa KuliahKita?</a>
+        <a href="#harga" class="hover:text-zinc-950 transition">Harga Patungan</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <a href="auth.html?tab=join" class="hidden sm:inline-flex text-xs font-bold text-zinc-700 hover:text-zinc-950 px-3 py-2 transition">
+          Gabung Kode
+        </a>
+        <a id="nav-cta-btn" href="auth.html"
+          class="inline-flex items-center gap-1.5 bg-zinc-950 hover:bg-indigo-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm">
+          <span>Mulai Sekarang</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- 2. HERO SECTION                                           -->
+  <!-- ========================================================= -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-16 lg:pt-20 lg:pb-24">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+      
+      <!-- Teks Hero -->
+      <div class="lg:col-span-6 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-xs font-bold">
+          <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+          <span>PWA KANBAN + BOT PENGINGAT WHATSAPP</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-zinc-950 leading-[1.12]">
+          Tugas kelompok & kelas kelar tepat waktu, <span class="text-indigo-600 underline decoration-lime-400 decoration-4 underline-offset-4">tanpa drama.</span>
+        </h1>
+
+        <p class="text-zinc-600 text-base sm:text-lg leading-relaxed">
+          Papan pembagian tugas yang terhubung langsung ke grup WhatsApp. Sekali input jadwal, bot otomatis mengingatkan anggota sebelum tenggat tiba.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3 pt-1">
+          <a href="auth.html?tab=create"
+            class="inline-flex items-center gap-2 bg-zinc-950 hover:bg-indigo-600 text-white font-bold text-sm px-6 py-3.5 rounded-2xl transition shadow-md">
+            <i data-lucide="sparkles" class="w-4 h-4 text-lime-400"></i>
+            <span>Buat Ruang Gratis</span>
+          </a>
+          <a href="auth.html?tab=join"
+            class="inline-flex items-center gap-2 bg-white hover:bg-zinc-100 text-zinc-900 border border-zinc-200 font-bold text-sm px-5 py-3.5 rounded-2xl transition">
+            <i data-lucide="log-in" class="w-4 h-4 text-zinc-500"></i>
+            <span>Gabung Pakai Kode</span>
+          </a>
+        </div>
+
+        <div class="flex items-center gap-4 pt-2 text-xs text-zinc-500 font-medium">
+          <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Tanpa instalasi berat (PWA)</span>
+          <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Gratis untuk 1 kelas</span>
+        </div>
+      </div>
+
+      <!-- Visual Simulasi Produk (Kanban + Bot WA) -->
+      <div class="lg:col-span-6">
+        <div class="relative bg-zinc-900 rounded-3xl p-5 sm:p-6 border border-zinc-800 shadow-2xl space-y-4">
+          
+          <!-- Mini Preview Kanban Card -->
+          <div class="bg-white rounded-2xl p-4 shadow-md border border-zinc-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">
+                Papan Web • Kode: T3D-DEMO
+              </span>
+              <span class="text-[11px] font-mono font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">
+                Besok, 23:59
+              </span>
+            </div>
+            <p class="font-bold text-sm text-zinc-950">Revisi Laporan BMC & Simulasi Keuangan</p>
+            <div class="flex items-center justify-between mt-3 pt-2.5 border-t border-zinc-100 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 font-extrabold text-[10px] flex items-center justify-center">RH</span>
+                <span class="font-semibold text-zinc-700">Rohan (Anggota)</span>
+              </div>
+              <span class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">Status: Dikerjakan</span>
+            </div>
+          </div>
+
+          <!-- Panah Sinkronisasi -->
+          <div class="flex items-center justify-center gap-2 text-[11px] font-mono text-lime-400">
+            <i data-lucide="arrow-down-up" class="w-3.5 h-3.5"></i>
+            <span>AUTO-SYNC KE GRUP WHATSAPP</span>
+          </div>
+
+          <!-- Mini Preview Chat Bot WA -->
+          <div class="bg-zinc-800/90 rounded-2xl p-4 border border-zinc-700/80 text-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Bot KuliahKita
+              </span>
+              <span class="font-mono text-[10px] text-zinc-400">20:00 WIB</span>
+            </div>
+            <p class="text-amber-300 font-semibold">⏰ Pengingat Tugas H-1 (Besok 23:59)</p>
+            <p class="text-zinc-200 leading-relaxed">
+              Halo <strong>@Rohan</strong>, tugas <em>Revisi Laporan BMC</em> masih berstatus <strong>Dikerjakan</strong>. Yuk segera selesaikan dan tempel link buktinya di papan!
+            </p>
+            <div class="pt-2 border-t border-dashed border-zinc-700 text-[11px] text-zinc-400">
+              📢 <em>Print makalah & jilid kilat depan gerbang kampus — WA 0812-XXXX</em>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 3. CARA KERJA (3 LANGKAH SIMPEL)                          -->
+  <!-- ========================================================= -->
+  <section id="cara-kerja" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-zinc-200/80">
+    <div class="max-w-xl mb-10">
+      <span class="font-mono text-xs font-bold uppercase tracking-wider text-indigo-600">Alur Kerja Simpel</span>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-zinc-950 mt-1">Tiga langkah bereskan tugas bareng.</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-3xl border border-zinc-200/90 tactile-card">
+        <span class="font-mono text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">01</span>
+        <h3 class="font-extrabold text-base text-zinc-950 mt-4 mb-2">Buat Ruang & Bagikan Kode</h3>
+        <p class="text-xs text-zinc-600 leading-relaxed">
+          Ketua kelompok atau koor kelas membuat ruang baru dalam 10 detik, lalu membagikan kode unik (misal <code class="font-mono font-bold text-zinc-800">T3D-DEMO</code>) ke anggota.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl border border-zinc-200/90 tactile-card">
+        <span class="font-mono text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">02</span>
+        <h3 class="font-extrabold text-base text-zinc-950 mt-4 mb-2">Bagi Tugas & Pasang Tenggat</h3>
+        <p class="text-xs text-zinc-600 leading-relaxed">
+          Catat pembagian tugas beserta nama penanggung jawab dan jam deadline melalui web atau langsung ketik perintah di grup WhatsApp.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl border border-zinc-200/90 tactile-card">
+        <span class="font-mono text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">03</span>
+        <h3 class="font-extrabold text-base text-zinc-950 mt-4 mb-2">Bot Menagih Otomatis</h3>
+        <p class="text-xs text-zinc-600 leading-relaxed">
+          Sistem otomatis mengirim pengingat H-3, H-1, hingga 4 jam sebelum tenggat khusus ke anggota yang status kartunya belum selesai.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 4. PERBANDINGAN: KENAPA NGGAK SPREADSHEET AJA?            -->
+  <!-- ========================================================= -->
+  <section id="perbandingan" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-zinc-200/80">
+    <div class="bg-zinc-900 text-white rounded-3xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-5 space-y-3">
+        <span class="font-mono text-xs font-bold uppercase tracking-wider text-lime-400">Solusi Nyata</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold leading-tight">Kenapa nggak pakai Spreadsheet biasa aja?</h2>
+        <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+          Spreadsheet memang rapi untuk mencatat, tapi sifatnya pasif—mahasiswa jarang membukanya kalau tidak diingatkan.
+        </p>
+      </div>
+
+      <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-zinc-800/70 p-5 rounded-2xl border border-zinc-700/70 space-y-2.5">
+          <p class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Cara Lama (Spreadsheet / Chat)</p>
+          <ul class="text-xs text-zinc-300 space-y-2">
+            <li class="flex items-start gap-2"><i data-lucide="x" class="w-4 h-4 text-red-400 shrink-0"></i> Ketua harus cek manual & nagih satu per satu</li>
+            <li class="flex items-start gap-2"><i data-lucide="x" class="w-4 h-4 text-red-400 shrink-0"></i> Link file tugas sering tenggelam di chat grup</li>
+            <li class="flex items-start gap-2"><i data-lucide="x" class="w-4 h-4 text-red-400 shrink-0"></i> Tidak ada pengingat otomatis mendekati jam kumpul</li>
+          </ul>
+        </div>
+
+        <div class="bg-indigo-600/20 p-5 rounded-2xl border border-indigo-500/40 space-y-2.5">
+          <p class="text-xs font-bold text-lime-400 uppercase tracking-wider">Pakai KuliahKita</p>
+          <ul class="text-xs text-zinc-100 space-y-2">
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lime-400 shrink-0"></i> Bot WA aktif mengingatkan otomatis sesuai jadwal</li>
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lime-400 shrink-0"></i> Semua link bukti kerja terkumpul rapi per kartu</li>
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lime-400 shrink-0"></i> Pengingat berhenti otomatis saat tugas selesai</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 5. HARGA PATUNGAN (SESUAI MODEL BISNIS BMC)               -->
+  <!-- ========================================================= -->
+  <section id="harga" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 border-t border-zinc-200/80">
+    <div class="text-center max-w-xl mx-auto mb-10">
+      <span class="font-mono text-xs font-bold uppercase tracking-wider text-indigo-600">Ramah Kantong Mahasiswa</span>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-zinc-950 mt-1">Gratis dipakai, murah kalau patungan.</h2>
+      <p class="text-xs sm:text-sm text-zinc-500 mt-2">Pilih paket sesuai kebutuhan kelompok atau satu kelasmu.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      
+      <!-- Paket Gratis -->
+      <div class="bg-white p-7 rounded-3xl border border-zinc-200 flex flex-col justify-between">
+        <div>
+          <span class="text-xs font-bold px-3 py-1 rounded-full bg-zinc-100 text-zinc-700">PAKET GRATIS</span>
+          <div class="mt-4 flex items-baseline gap-1">
+            <span class="text-3xl font-extrabold text-zinc-950">Rp 0</span>
+            <span class="text-xs text-zinc-500">/ selamanya</span>
+          </div>
+          <p class="text-xs text-zinc-500 mt-2">Cocok untuk penggunaan harian dengan dukungan iklan mitra kampus di footer bot.</p>
+
+          <ul class="text-xs text-zinc-700 space-y-3 my-6 pt-5 border-t border-zinc-100">
+            <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i> Papan Kanban & tugas tanpa batas</li>
+            <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i> Pengingat otomatis grup WA (H-1)</li>
+            <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i> Tersedia sisipan iklan (*footer ads*) di pesan bot</li>
+          </ul>
+        </div>
+
+        <a href="auth.html?tab=create"
+          class="w-full py-3 rounded-xl border border-zinc-300 hover:bg-zinc-100 text-zinc-900 font-bold text-xs text-center transition">
+          Mulai Pakai Gratis
+        </a>
+      </div>
+
+      <!-- Paket Patungan Pro -->
+      <div class="bg-zinc-950 text-white p-7 rounded-3xl border border-zinc-800 shadow-xl flex flex-col justify-between relative">
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold px-3 py-1 rounded-full bg-lime-400 text-zinc-950">PATUNGAN PRO</span>
+            <span class="font-mono text-[11px] text-zinc-400">±Rp500 / mahasiswa</span>
+          </div>
+          <div class="mt-4 flex items-baseline gap-1">
+            <span class="text-3xl font-extrabold text-white">Rp 15.000</span>
+            <span class="text-xs text-zinc-400">/ semester / ruang</span>
+          </div>
+          <p class="text-xs text-zinc-400 mt-2">Patungan satu kelas atau satu kelompok untuk fitur pengingat penuh tanpa iklan.</p>
+
+          <ul class="text-xs text-zinc-200 space-y-3 my-6 pt-5 border-t border-zinc-800">
+            <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-lime-400 shrink-0"></i> Pengingat lengkap: <strong>H-3, H-1, dan 4 Jam</strong> sebelum tenggat</li>
+            <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-lime-400 shrink-0"></i> Pengingat <strong>Japri (CP)</strong> langsung ke anggota yang belum selesai</li>
+            <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-lime-400 shrink-0"></i> 100% bebas iklan sisipan di seluruh pesan bot</li>
+          </ul>
+        </div>
+
+        <a href="auth.html?tab=create"
+          class="w-full py-3 rounded-xl bg-lime-400 hover:bg-lime-300 text-zinc-950 font-extrabold text-xs text-center transition">
+          Buat Ruang & Coba Demo Pro
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- 6. FOOTER                                                 -->
+  <!-- ========================================================= -->
+  <footer class="border-t border-zinc-200/80 py-8 mt-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+      <div class="flex items-center gap-2 font-bold text-zinc-800">
+        <span class="w-6 h-6 rounded-md bg-zinc-950 text-white flex items-center justify-center text-[10px]">KK</span>
+        <span>KuliahKita</span>
+      </div>
+      <p>Dibuat untuk membantu produktivitas tugas individu & kelompok mahasiswa.</p>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    // Jika user sudah login sebelumnya, ubah tombol navbar agar bisa langsung masuk ke papan
+    const savedUser = JSON.parse(localStorage.getItem('kk_user'));
+    if (savedUser) {
+      const navCta = document.getElementById('nav-cta-btn');
+      navCta.href = 'board.html';
+      navCta.innerHTML = `<span>Buka Ruang (${savedUser.code})</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>`;
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
