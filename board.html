@@ -3,282 +3,394 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KuliahKita — Papan Tugas Kanban</title>
+  <title>Papan Tugas — KuliahKita</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#111827" />
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <meta name="theme-color" content="#09090b" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          }
-        }
-      }
-    }
-  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
-<body class="text-zinc-900 min-h-screen antialiased selection:bg-indigo-600 selection:text-white pb-24">
+<body class="bg-zinc-50 text-zinc-900 min-h-screen flex overflow-x-hidden">
 
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300">
+    <div id="toast-box" class="bg-zinc-950 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 text-sm font-medium border border-zinc-800">
+      <i data-lucide="info" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+      <span id="toast-msg">Notifikasi</span>
+    </div>
+  </div>
 
-  <!-- Top Glass Navbar -->
-  <header class="sticky top-0 z-20 bg-[#FAF9F6]/85 backdrop-blur-md border-b border-zinc-200/80">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-extrabold text-sm tracking-tight shadow-sm">
-          KK
-        </div>
-        <div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <h2 id="display-ws-name" class="font-extrabold text-base sm:text-lg text-zinc-950 tracking-tight">Memuat...</h2>
-            <span id="display-plan-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-zinc-200 text-zinc-700">GRATIS</span>
+  <!-- MOBILE SIDEBAR BACKDROP -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-30 hidden lg:hidden"></div>
+
+  <!-- =========================================================
+       1. COLLAPSIBLE SIDEBAR (NAVIGASI RUANG, BOT WA & ANGGOTA)
+       ========================================================= -->
+  <aside id="app-sidebar" class="fixed lg:sticky top-0 left-0 z-40 h-screen w-72 bg-white border-r border-zinc-200/90 flex flex-col justify-between transition-transform duration-200 -translate-x-full lg:translate-x-0 shrink-0">
+    <div class="p-4 space-y-5 overflow-y-auto">
+      <!-- Brand Header -->
+      <div class="flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-extrabold text-sm">K</div>
+          <div>
+            <span class="font-extrabold text-sm tracking-tight text-zinc-950 block leading-none">KuliahKita</span>
+            <span class="text-[10px] font-semibold text-zinc-400">Workspace Manager</span>
           </div>
-          <div class="flex items-center gap-2 text-xs text-zinc-500 mt-0.5">
-            <button onclick="copyWorkspaceCode()" title="Salin kode untuk dibagikan"
-              class="inline-flex items-center gap-1 font-mono font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded transition cursor-pointer">
-              <span id="display-ws-code">CODE</span>
-              <i data-lucide="copy" class="w-3 h-3"></i>
-            </button>
-            <span>•</span>
-            <span id="display-user-info" class="font-medium text-zinc-600">User</span>
-          </div>
-        </div>
+        </a>
+        <button onclick="toggleSidebar(false)" class="lg:hidden p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
       </div>
 
-      <div class="flex items-center gap-2">
-        <button id="btn-upgrade" onclick="openUpgradeModal()"
-          class="inline-flex items-center gap-1.5 bg-zinc-950 hover:bg-indigo-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition cursor-pointer shadow-sm">
-          <i data-lucide="zap" class="w-3.5 h-3.5 text-lime-400"></i>
-          <span>Upgrade Patungan</span>
+      <!-- Kartu Status Bot WhatsApp -->
+      <div id="wa-status-card" class="p-3.5 rounded-2xl border border-zinc-200 bg-zinc-50/80 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
+            <i data-lucide="bot" class="w-3.5 h-3.5 text-emerald-600"></i> Bot Pengingat WA
+          </span>
+          <span id="wa-status-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+        </div>
+        <p id="wa-status-text" class="text-xs font-semibold text-zinc-800 leading-snug">Memeriksa koneksi bot...</p>
+        <button onclick="copyBotConnectCmd()" class="w-full py-1.5 px-2.5 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-lg text-[11px] font-mono font-bold text-zinc-700 flex items-center justify-between transition cursor-pointer">
+          <span id="sidebar-cmd-code">!daftar KODE</span>
+          <span class="text-indigo-600 font-sans">Salin</span>
         </button>
-        <button onclick="openAdsModal()"
-          class="inline-flex items-center gap-1.5 bg-white hover:bg-zinc-100 text-zinc-700 border border-zinc-200 text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer">
-          <i data-lucide="megaphone" class="w-3.5 h-3.5 text-zinc-500"></i>
-          <span class="hidden sm:inline">Iklan Bot</span>
-        </button>
-        <button onclick="logout()" title="Keluar Workspace"
-          class="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-        </button>
+      </div>
+
+      <!-- Pindah Ruang Cepat (Riwayat) -->
+      <div>
+        <div class="flex items-center justify-between px-1 mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Ruang Kamu</span>
+          <a href="auth.html?tab=create" class="text-[11px] font-bold text-indigo-600 hover:underline">+ Baru</a>
+        </div>
+        <div id="sidebar-workspaces" class="space-y-1"></div>
+      </div>
+
+      <!-- Anggota Terlibat di Papan Ini -->
+      <div>
+        <div class="px-1 mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Anggota & PJ Aktif</span>
+        </div>
+        <div id="sidebar-members" class="flex flex-wrap gap-1.5 px-1"></div>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 mt-6 space-y-6">
-    
-    <!-- Bento Summary & Filter Strip -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-      <div class="lg:col-span-7 bg-white p-4 sm:p-5 rounded-2xl border border-zinc-200/80 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-2">
-          <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Progres Penyelesaian</span>
-            <h3 class="text-sm font-bold text-zinc-900 mt-0.5">Ringkasan Tugas Workspace</h3>
-          </div>
-          <span id="progress-percent" class="font-mono text-xl font-extrabold text-indigo-600">0%</span>
+    <!-- Footer Sidebar: Paket & Profil User -->
+    <div class="p-4 border-t border-zinc-200/80 space-y-3 bg-zinc-50/50">
+      <div id="plan-upgrade-box" class="p-3 rounded-xl bg-indigo-50/80 border border-indigo-100">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-extrabold text-indigo-950">Paket Gratis (Iklan)</span>
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-indigo-600">Rp15rb/smt</span>
         </div>
-        <div class="w-full h-2.5 bg-zinc-100 rounded-full overflow-hidden my-2">
-          <div id="progress-bar" class="h-full bg-indigo-600 rounded-full transition-all duration-500" style="width: 0%"></div>
-        </div>
-        <div class="flex items-center justify-between text-xs text-zinc-500 mt-1">
-          <span id="progress-detail">0 dari 0 tugas selesai</span>
-          <span class="font-mono text-[11px] text-zinc-400">Bot command: !tugas</span>
-        </div>
+        <p class="text-[11px] text-indigo-800/80 leading-relaxed mb-2">Hapus iklan footer WA & aktifkan pengingat H-3 dan 4 jam sebelum deadline.</p>
+        <button onclick="simulateUpgradePro()" class="w-full py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition cursor-pointer">
+          Simulasi Upgrade Pro ✨
+        </button>
       </div>
 
-      <div class="lg:col-span-5 bg-zinc-900 text-white p-4 sm:p-5 rounded-2xl flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Filter Tampilan</span>
-          <span class="text-[11px] text-lime-400 font-semibold flex items-center gap-1">
-            <i data-lucide="bot" class="w-3.5 h-3.5"></i> WA Sync Aktif
-          </span>
+      <!-- Profil User Interaktif + Tombol Keluar Jelas -->
+      <div class="relative pt-1">
+        <!-- Popover Menu User (Muncul saat profil diklik) -->
+        <div id="user-menu-popover" class="hidden mb-2 p-2.5 bg-white border border-zinc-200 rounded-xl shadow-lg space-y-1">
+          <div class="px-2 py-1.5 border-b border-zinc-100">
+            <p class="text-[11px] font-bold text-zinc-900" id="popover-user-name">User</p>
+            <p class="text-[10px] font-mono text-zinc-500" id="popover-user-wa">628...</p>
+          </div>
+          <a href="auth.html" onclick="localStorage.removeItem('kk_user')"
+            class="w-full flex items-center gap-2 px-2 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 rounded-lg transition">
+            <i data-lucide="repeat" class="w-3.5 h-3.5 text-indigo-600"></i>
+            <span>Ganti Ruang / Identitas</span>
+          </a>
+          <button onclick="logoutWorkspace()"
+            class="w-full flex items-center gap-2 px-2 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <span>Keluar (Logout)</span>
+          </button>
         </div>
-        <div class="flex items-center gap-2 my-3">
-          <button id="filter-all" onclick="setFilter('all')"
-            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-white text-zinc-950 transition cursor-pointer">
+
+        <div class="flex items-center justify-between gap-2">
+          <button onclick="toggleUserMenu()" type="button"
+            class="flex-1 flex items-center gap-2.5 min-w-0 p-1.5 -ml-1.5 rounded-xl hover:bg-zinc-200/60 text-left transition cursor-pointer">
+            <div id="user-avatar" class="w-8 h-8 rounded-full bg-zinc-900 text-white text-xs font-bold flex items-center justify-center shrink-0">U</div>
+            <div class="min-w-0 flex-1">
+              <p id="user-display-name" class="text-xs font-bold text-zinc-900 truncate">User</p>
+              <p id="user-display-role" class="text-[10px] font-semibold text-zinc-500 truncate">Anggota</p>
+            </div>
+            <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-zinc-400 shrink-0"></i>
+          </button>
+
+          <button onclick="logoutWorkspace()" title="Keluar / Logout"
+            class="px-2.5 py-2 bg-white hover:bg-rose-50 text-zinc-600 hover:text-rose-600 border border-zinc-200 hover:border-rose-200 rounded-xl text-[11px] font-bold flex items-center gap-1 transition cursor-pointer shrink-0">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <span>Keluar</span>
+          </button>
+        </div>
+      </div>
+  </aside>
+
+  <!-- =========================================================
+       2. MAIN WORKSPACE AREA
+       ========================================================= -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <!-- Top Header -->
+    <header class="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-zinc-200/80 px-4 sm:px-6 py-3.5">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <button onclick="toggleSidebar(true)" class="lg:hidden p-2 bg-zinc-100 hover:bg-zinc-200 rounded-xl text-zinc-800">
+            <i data-lucide="panel-left" class="w-4 h-4"></i>
+          </button>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 id="ws-title" class="text-base sm:text-lg font-extrabold text-zinc-950 tracking-tight truncate">Memuat Ruang...</h1>
+              <button onclick="copyWorkspaceCode()" title="Salin Kode Ruang"
+                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-mono text-xs font-bold transition cursor-pointer">
+                <span id="ws-code-badge">---</span>
+                <i data-lucide="copy" class="w-3 h-3"></i>
+              </button>
+              <span id="ws-plan-badge" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">FREE</span>
+            </div>
+            <p id="ws-subtitle" class="text-xs text-zinc-500 mt-0.5">Sinkronisasi real-time dengan bot pengingat WhatsApp</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="openTaskModal()"
+            class="bg-zinc-950 hover:bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shadow-xs transition cursor-pointer">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Tambah Tugas</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 space-y-5">
+
+      <!-- Progress Bar & Ringkasan Statistik Ruang -->
+      <section class="bg-white border border-zinc-200/90 rounded-2xl p-4 shadow-2xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Progres Penyelesaian Ruang</span>
+              <span id="progress-percent" class="text-xs font-extrabold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700">0%</span>
+            </div>
+            <p id="progress-caption" class="text-xs text-zinc-500 mt-0.5">0 dari 0 tugas telah disetujui selesai</p>
+          </div>
+          <div class="flex items-center gap-4 text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+              <span class="text-zinc-500">Aktif:</span>
+              <strong id="stat-active" class="text-zinc-900">0</strong>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span class="text-zinc-500">Cek Bukti:</span>
+              <strong id="stat-review" class="text-zinc-900">0</strong>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+              <span class="text-zinc-500">Mendesak:</span>
+              <strong id="stat-urgent" class="text-rose-600">0</strong>
+            </div>
+          </div>
+        </div>
+        <div class="w-full h-2 bg-zinc-100 rounded-full overflow-hidden">
+          <div id="progress-bar-fill" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </section>
+
+      <!-- Toolbar: Quick Filter, Search & Dual View Toggle -->
+      <section class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <!-- Quick Filter Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+          <button onclick="setTaskFilter('all')" id="filter-all"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white transition cursor-pointer shrink-0">
             Semua Tugas
           </button>
-          <button id="filter-mine" onclick="setFilter('mine')"
-            class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 transition cursor-pointer">
-            Tugas Saya Saja
+          <button onclick="setTaskFilter('mine')" id="filter-mine"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-100 transition cursor-pointer shrink-0 flex items-center gap-1.5">
+            <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+            <span>Tugas Saya</span>
+          </button>
+          <button onclick="setTaskFilter('urgent')" id="filter-urgent"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-100 transition cursor-pointer shrink-0 flex items-center gap-1.5">
+            <i data-lucide="flame" class="w-3.5 h-3.5 text-rose-500"></i>
+            <span>Mendesak (&lt; 48 Jam)</span>
           </button>
         </div>
-        <p class="text-[11px] text-zinc-400">
-          Ketik <code class="text-lime-300 font-mono">!daftar <span id="inline-ws-code">CODE</span></code> di grup WA untuk menghubungkan bot.
-        </p>
-      </div>
-    </div>
 
-    <!-- Command-Style Quick Add Task Bar -->
-    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-zinc-200/90 shadow-sm">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <!-- Search & View Switcher -->
         <div class="flex items-center gap-2">
-          <span class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-            <i data-lucide="plus" class="w-4 h-4"></i>
-          </span>
-          <h3 class="text-sm font-bold text-zinc-900">Tambah Tugas Baru</h3>
+          <div class="relative flex-1 sm:w-56">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="search-task-input" oninput="renderBoard()" placeholder="Cari tugas atau nama PJ..."
+              class="w-full pl-8 pr-3 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-medium focus:border-zinc-950 outline-none transition" />
+          </div>
+
+          <!-- Dual View Switcher -->
+          <div class="bg-zinc-200/70 p-1 rounded-xl flex items-center shrink-0">
+            <button onclick="setBoardView('kanban')" id="view-btn-kanban" title="Tampilan Papan Kanban"
+              class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-white text-zinc-950 shadow-2xs flex items-center gap-1.5 transition cursor-pointer">
+              <i data-lucide="kanban" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Papan</span>
+            </button>
+            <button onclick="setBoardView('list')" id="view-btn-list" title="Tampilan Daftar Tenggat"
+              class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 transition cursor-pointer">
+              <i data-lucide="list-todo" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Daftar</span>
+            </button>
+          </div>
         </div>
-        <div class="flex items-center gap-1.5 text-[11px]">
-          <span class="text-zinc-400">Isi cepat deadline:</span>
-          <button type="button" onclick="setQuickDeadline(1)" class="px-2 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 font-semibold text-zinc-700 transition cursor-pointer">Besok 23:59</button>
-          <button type="button" onclick="setQuickDeadline(3)" class="px-2 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 font-semibold text-zinc-700 transition cursor-pointer">+3 Hari</button>
+      </section>
+
+      <!-- VIEW A: PAPAN KANBAN (4 KOLOM) -->
+      <section id="kanban-view" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+        <!-- Kolom 1: To Do -->
+        <div class="bg-zinc-100/80 border border-zinc-200/70 rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
+              <h2 class="text-xs font-extrabold uppercase tracking-wider text-zinc-700">To Do</h2>
+            </div>
+            <span id="count-todo" class="text-xs font-bold px-2 py-0.5 rounded-full bg-white text-zinc-600 border border-zinc-200/80">0</span>
+          </div>
+          <div id="col-todo" class="space-y-2.5 min-h-[140px]"></div>
         </div>
+
+        <!-- Kolom 2: Dikerjakan -->
+        <div class="bg-indigo-50/40 border border-indigo-100 rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+              <h2 class="text-xs font-extrabold uppercase tracking-wider text-indigo-950">Dikerjakan</h2>
+            </div>
+            <span id="count-in_progress" class="text-xs font-bold px-2 py-0.5 rounded-full bg-white text-indigo-700 border border-indigo-100">0</span>
+          </div>
+          <div id="col-in_progress" class="space-y-2.5 min-h-[140px]"></div>
+        </div>
+
+        <!-- Kolom 3: Cek Bukti -->
+        <div class="bg-amber-50/40 border border-amber-100 rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              <h2 class="text-xs font-extrabold uppercase tracking-wider text-amber-950">Cek Bukti</h2>
+            </div>
+            <span id="count-review" class="text-xs font-bold px-2 py-0.5 rounded-full bg-white text-amber-700 border border-amber-100">0</span>
+          </div>
+          <div id="col-review" class="space-y-2.5 min-h-[140px]"></div>
+        </div>
+
+        <!-- Kolom 4: Selesai (ACC) -->
+        <div class="bg-emerald-50/40 border border-emerald-100 rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h2 class="text-xs font-extrabold uppercase tracking-wider text-emerald-950">Selesai</h2>
+            </div>
+            <span id="count-done" class="text-xs font-bold px-2 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-100">0</span>
+          </div>
+          <div id="col-done" class="space-y-2.5 min-h-[140px]"></div>
+        </div>
+      </section>
+
+      <!-- VIEW B: DAFTAR TENGGAT TERDEKAT (TIMELINE LIST) -->
+      <section id="list-view" class="hidden bg-white border border-zinc-200/90 rounded-2xl overflow-hidden shadow-2xs">
+        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200/80 flex items-center justify-between">
+          <span class="text-xs font-bold text-zinc-700">Diurutkan dari Tenggat Waktu Paling Dekat</span>
+          <span id="list-total-label" class="text-xs text-zinc-500">0 tugas</span>
+        </div>
+        <div id="list-container" class="divide-y divide-zinc-100"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =========================================================
+       MODAL 1: TAMBAH TUGAS BARU
+       ========================================================= -->
+  <div id="task-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-zinc-950/50 backdrop-blur-xs p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 animate-in fade-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-extrabold text-zinc-950">Tambah Tugas Baru</h3>
+        <button onclick="closeTaskModal()" class="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
 
-      <form id="task-form" class="grid grid-cols-1 md:grid-cols-12 gap-3">
-        <div class="md:col-span-5">
-          <input type="text" id="task-title" required placeholder="Judul tugas atau bagian kerja..."
-            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:bg-white focus:border-indigo-600 outline-none transition" />
+      <form id="new-task-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-zinc-700 mb-1.5">Judul Tugas / Bagian Kerja</label>
+          <input type="text" id="task-title" required placeholder="Misal: Susun Bab 2 & Cari Referensi Jurnal"
+            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium focus:bg-white focus:border-zinc-950 outline-none transition" />
         </div>
-        <div class="md:col-span-3">
-          <input type="text" id="task-assignee" required placeholder="Penanggung jawab"
-            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:bg-white focus:border-indigo-600 outline-none transition" />
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-zinc-700 mb-1.5">Penanggung Jawab (PJ)</label>
+            <input type="text" id="task-assignee" required placeholder="Nama anggota"
+              class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium focus:bg-white focus:border-zinc-950 outline-none transition" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-zinc-700 mb-1.5">No. WA PJ (62...)</label>
+            <input type="text" id="task-wa" required placeholder="628123456789"
+              class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-mono focus:bg-white focus:border-zinc-950 outline-none transition" />
+          </div>
         </div>
-        <div class="md:col-span-2">
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-700 mb-1.5">Batas Waktu (Deadline)</label>
           <input type="datetime-local" id="task-deadline" required
-            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-mono focus:bg-white focus:border-indigo-600 outline-none transition" />
+            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium focus:bg-white focus:border-zinc-950 outline-none transition" />
         </div>
-        <div class="md:col-span-2">
-          <button type="submit"
-            class="w-full h-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
-            <i data-lucide="send" class="w-3.5 h-3.5"></i>
-            <span>Simpan</span>
-          </button>
-        </div>
+
+        <button type="submit"
+          class="w-full bg-zinc-950 hover:bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm transition cursor-pointer mt-2">
+          Simpan & Jadwalkan Pengingat WA
+        </button>
       </form>
     </div>
-
-    <!-- 4-Column Kanban Board -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
-      <div class="bg-zinc-100/80 p-3.5 rounded-2xl border border-zinc-200/70">
-        <div class="flex justify-between items-center mb-3 px-1">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
-            <h4 class="font-bold text-xs uppercase tracking-wider text-zinc-700">To Do</h4>
-          </div>
-          <span id="count-todo" class="font-mono text-xs bg-white border border-zinc-200 px-2 py-0.5 rounded-md font-bold text-zinc-700">0</span>
-        </div>
-        <div id="col-todo" class="space-y-3 min-h-[120px]"></div>
-      </div>
-
-      <div class="bg-indigo-50/60 p-3.5 rounded-2xl border border-indigo-100">
-        <div class="flex justify-between items-center mb-3 px-1">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
-            <h4 class="font-bold text-xs uppercase tracking-wider text-indigo-900">Dikerjakan</h4>
-          </div>
-          <span id="count-in_progress" class="font-mono text-xs bg-white border border-indigo-200 px-2 py-0.5 rounded-md font-bold text-indigo-700">0</span>
-        </div>
-        <div id="col-in_progress" class="space-y-3 min-h-[120px]"></div>
-      </div>
-
-      <div class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200/60">
-        <div class="flex justify-between items-center mb-3 px-1">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <h4 class="font-bold text-xs uppercase tracking-wider text-amber-900">Cek Bukti</h4>
-          </div>
-          <span id="count-review" class="font-mono text-xs bg-white border border-amber-200 px-2 py-0.5 rounded-md font-bold text-amber-700">0</span>
-        </div>
-        <div id="col-review" class="space-y-3 min-h-[120px]"></div>
-      </div>
-
-      <div class="bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-200/60">
-        <div class="flex justify-between items-center mb-3 px-1">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <h4 class="font-bold text-xs uppercase tracking-wider text-emerald-900">Selesai</h4>
-          </div>
-          <span id="count-done" class="font-mono text-xs bg-white border border-emerald-200 px-2 py-0.5 rounded-md font-bold text-emerald-700">0</span>
-        </div>
-        <div id="col-done" class="space-y-3 min-h-[120px]"></div>
-      </div>
-    </div>
-  </main>
-
-  <!-- MODALS -->
-  <div id="proof-modal" class="hidden fixed inset-0 bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-zinc-200 shadow-2xl">
-      <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mb-3">
-        <i data-lucide="link" class="w-5 h-5"></i>
-      </div>
-      <h3 class="font-extrabold text-lg text-zinc-950">Lampirkan Tautan Bukti Kerja</h3>
-      <p class="text-xs text-zinc-500 mt-1 mb-4">Tempel link Google Drive, Docs, Canva, atau GitHub agar ketua dapat memverifikasi hasil kerjamu.</p>
-      <input type="hidden" id="proof-task-id" />
-      <input type="url" id="proof-url" required placeholder="https://drive.google.com/..."
-        class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm mb-5 focus:bg-white focus:border-indigo-600 outline-none" />
-      <div class="flex justify-end gap-2">
-        <button onclick="closeModal('proof-modal')" class="px-4 py-2 text-xs font-bold text-zinc-500 hover:text-zinc-800 cursor-pointer">Batal</button>
-        <button onclick="submitProof()" class="px-4 py-2.5 bg-zinc-950 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition cursor-pointer">Kirim Bukti</button>
-      </div>
-    </div>
   </div>
 
-  <div id="upgrade-modal" class="hidden fixed inset-0 bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-    <div class="bg-zinc-950 text-white rounded-3xl max-w-md w-full p-6 border border-zinc-800 shadow-2xl">
-      <div class="flex items-center justify-between">
-        <span class="bg-lime-400 text-zinc-950 text-[11px] font-extrabold px-3 py-1 rounded-full tracking-wide">PATUNGAN 1 SEMESTER</span>
-        <button onclick="closeModal('upgrade-modal')" class="text-zinc-400 hover:text-white cursor-pointer">
+  <!-- =========================================================
+       MODAL 2: SETOR BUKTI KERJA (LINK GDRIVE / DOCS / GITHUB)
+       ========================================================= -->
+  <div id="proof-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-zinc-950/50 backdrop-blur-xs p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-extrabold text-zinc-950">Setor Link Bukti Kerja</h3>
+        <button onclick="closeProofModal()" class="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <h3 class="font-extrabold text-2xl mt-4">KuliahKita Pro</h3>
-      <p class="text-xs text-zinc-400 mt-1">Cukup <strong class="text-white">Rp15.000 / semester</strong> untuk 1 kelas atau kelompok (±Rp500/mahasiswa jika patungan sekelas).</p>
-      <ul class="text-xs text-zinc-300 space-y-2.5 my-5 bg-zinc-900 p-4 rounded-2xl border border-zinc-800">
-        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-lime-400 shrink-0"></i> Pengingat lengkap: <strong>H-3, H-1, dan 4 Jam</strong> sebelum tenggat</li>
-        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-lime-400 shrink-0"></i> Pengingat <strong>Japri (CP)</strong> langsung ke anggota yang belum ACC</li>
-        <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-lime-400 shrink-0"></i> Bebas iklan sisipan di pesan pengingat bot</li>
-      </ul>
-      <div class="bg-white text-zinc-900 rounded-2xl p-4 mb-5 text-center">
-        <p class="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400">Scan QRIS Pembayaran (Simulasi Demo)</p>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=SIMULASI-QRIS-KULIAHKITA-PRO" alt="QRIS Demo" class="mx-auto my-2 rounded-lg" />
-        <p class="font-mono text-sm font-extrabold">Rp 15.000</p>
-      </div>
-      <button onclick="confirmUpgrade()" class="w-full py-3 bg-lime-400 hover:bg-lime-300 text-zinc-950 rounded-xl text-xs font-extrabold transition cursor-pointer">
-        Simulasi Bayar Berhasil ✓
-      </button>
+      <p class="text-xs text-zinc-500 mb-4">Tempel link Google Docs, Drive, Canva, atau GitHub agar ketua kelompok bisa memeriksa hasilmu sebelum ACC.</p>
+
+      <form id="proof-form" class="space-y-4">
+        <input type="hidden" id="proof-task-id" />
+        <div>
+          <label class="block text-xs font-bold text-zinc-700 mb-1.5">URL / Link Hasil Tugas</label>
+          <input type="url" id="proof-url" required placeholder="https://docs.google.com/document/d/..."
+            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium focus:bg-white focus:border-zinc-950 outline-none transition" />
+        </div>
+        <button type="submit"
+          class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-sm transition cursor-pointer">
+          Kirim Bukti untuk Diperiksa
+        </button>
+      </form>
     </div>
   </div>
 
-  <div id="ads-modal" class="hidden fixed inset-0 bg-zinc-950/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 border border-zinc-200 shadow-2xl">
-      <div class="flex items-center justify-between mb-1">
-        <h3 class="font-extrabold text-lg text-zinc-950">Pengaturan Footer Ads Bot</h3>
-        <button onclick="closeModal('ads-modal')" class="text-zinc-400 hover:text-zinc-700 cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      <p class="text-xs text-zinc-500 mb-4">Teks promosi ini otomatis disisipkan di bagian bawah pesan pengingat Bot WA untuk workspace versi Gratis.</p>
-      <textarea id="ads-text-input" rows="2" oninput="updateAdPreview()"
-        class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm mb-3 focus:bg-white focus:border-indigo-600 outline-none"></textarea>
-      <label class="flex items-center gap-2 text-xs font-semibold text-zinc-700 mb-4 cursor-pointer">
-        <input type="checkbox" id="ads-active-input" onchange="updateAdPreview()" class="rounded text-indigo-600" />
-        <span>Aktifkan iklan sisipan di pesan bot</span>
-      </label>
-      <div class="bg-[#EFEAE2] p-3.5 rounded-2xl mb-5 border border-stone-300/70">
-        <p class="text-[10px] font-mono font-bold text-stone-500 uppercase mb-1.5">Live Preview Pesan Bot WA:</p>
-        <div class="bg-white p-3 rounded-xl rounded-tl-none shadow-xs text-xs text-zinc-800 space-y-1.5 max-w-sm">
-          <p class="font-bold">📌 Pengingat Tugas H-1</p>
-          <p>Tugas: <em>Presentasi BMC</em> (Besok, 23:59)</p>
-          <div id="ads-preview-box" class="pt-1.5 border-t border-dashed border-zinc-200 text-[11px] text-indigo-700 font-medium"></div>
-        </div>
-      </div>
-      <div class="flex justify-end gap-2">
-        <button onclick="closeModal('ads-modal')" class="px-4 py-2 text-xs font-bold text-zinc-500 cursor-pointer">Batal</button>
-        <button onclick="saveAds()" class="px-5 py-2.5 bg-zinc-950 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition cursor-pointer">Simpan Perubahan</button>
-      </div>
-    </div>
-  </div>
+  <!-- =========================================================
+       DRAWER KANAN: DETAIL TUGAS & KONTROL PENGINGAT WA
+       ========================================================= -->
+  <div id="detail-drawer-backdrop" onclick="closeTaskDrawer()" class="fixed inset-0 z-40 hidden bg-zinc-950/40 backdrop-blur-xs"></div>
+  <aside id="detail-drawer" class="fixed top-0 right-0 z-50 h-screen w-full max-w-md bg-white border-l border-zinc-200 shadow-2xl transform translate-x-full transition-transform duration-200 flex flex-col justify-between">
+    <div id="drawer-body" class="p-6 overflow-y-auto space-y-5"></div>
+    <div id="drawer-footer" class="p-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between gap-2"></div>
+  </aside>
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/board.js"></script>

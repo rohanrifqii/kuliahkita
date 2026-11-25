@@ -81,7 +81,7 @@
           <div class="flex items-center justify-between border-b border-dashed border-zinc-800 pb-3.5">
             <div>
               <p class="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Kode Workspace</p>
-              <p id="preview-code" class="font-mono text-lg font-extrabold text-lime-400 tracking-wider mt-0.5">T3D-DEMO</p>
+              <p id="preview-code" class="font-mono text-lg font-extrabold text-lime-400 tracking-wider mt-0.5">KODE-RUANG</p>
             </div>
             <span id="preview-mode-badge" class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
               GABUNG RUANG
@@ -143,31 +143,34 @@
         </div>
 
         <!-- TAB A: GABUNG RUANG -->
-        <!-- TAB A: GABUNG RUANG -->
         <form id="join-form" class="space-y-4">
           <div class="mb-4">
             <h1 class="text-2xl font-extrabold text-zinc-950 tracking-tight">Masuk ke Kelas / Kelompok</h1>
-            <p class="text-xs text-zinc-500 mt-1">Pilih ruang yang pernah kamu masuki atau masukkan kode baru.</p>
+            <p class="text-xs text-zinc-500 mt-1">Pilih ruang yang pernah kamu masuki atau masukkan kode dari ketuamu.</p>
           </div>
 
           <!-- DAFTAR RUANG YANG PERNAH DIMASUKI (OTOMATIS MUNCUL JIKA ADA RIWAYAT) -->
-          <div id="recent-workspaces-box" class="hidden space-y-2 pb-4 mb-2 border-b border-zinc-200/80">
+          <div id="recent-workspaces-box" class="hidden space-y-2 pb-1">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Ruang Terakhir Kamu</span>
               <span class="text-[11px] text-zinc-400">Klik untuk masuk instan</span>
             </div>
             <div id="recent-workspaces-list" class="space-y-2"></div>
+
+            <!-- Pemisah Jelas antara Riwayat & Input Manual -->
+            <div class="relative flex pt-3 pb-1 items-center">
+              <div class="grow border-t border-zinc-200/90"></div>
+              <span class="shrink mx-3 text-[10px] font-bold uppercase tracking-wider text-zinc-400">Atau gabung pakai kode</span>
+              <div class="grow border-t border-zinc-200/90"></div>
+            </div>
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <label class="text-xs font-bold text-zinc-700">Kode Ruang Baru</label>
-              <button type="button" onclick="fillDemoCode(); syncPassPreview();" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 hover:underline cursor-pointer">
-                Pakai demo: T3D-DEMO
-              </button>
+              <label for="join-code" class="text-xs font-bold text-zinc-700">Kode Ruang</label>
             </div>
-            <input type="text" id="join-code" required value="T3D-DEMO" placeholder="CONTOH: T3D-DEMO"
-              class="w-full px-4 py-3 bg-white border border-zinc-200/90 rounded-xl text-sm uppercase font-mono font-bold tracking-wider shadow-2xs focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 outline-none transition" />
+            <input type="text" id="join-code" required placeholder="Masukkan kode dari ketua (misal: KK-8A2B)"
+              class="w-full px-4 py-3 bg-white border border-zinc-200/90 rounded-xl text-sm uppercase font-mono font-bold tracking-wider placeholder:font-sans placeholder:font-normal placeholder:normal-case placeholder:tracking-normal shadow-2xs focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 outline-none transition" />
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -189,7 +192,7 @@
               <select id="join-role"
                 class="w-full appearance-none px-3.5 py-2.5 pr-10 bg-white border border-zinc-200/90 rounded-xl text-sm font-medium shadow-2xs focus:border-zinc-950 focus:ring-2 focus:ring-zinc-950/10 outline-none transition cursor-pointer">
                 <option value="member">Anggota / Mahasiswa</option>
-                <option value="leader">Ketua Kelompok / Koordinator Kelas (Bisa ACC)</option>
+                <option value="leader">Ketua Kelompok / Koordinator Kelas</option>
               </select>
               <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             </div>
@@ -224,7 +227,7 @@
                   <option value="kelas">Satu Kelas (Koor)</option>
                   <option value="individu">Tugas Individu</option>
                 </select>
-                <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
               </div>
             </div>
           </div>
@@ -264,7 +267,7 @@
 
       <!-- Subtle Bottom Footer -->
       <div class="text-center text-[11px] text-zinc-400 pt-4">
-        KuliahKita • Manajemen Tugas & Pengingat WhatsApp Mahasiswa
+        KuliahKita - Manajemen Tugas & Pengingat WhatsApp Mahasiswa
       </div>
     </main>
 
