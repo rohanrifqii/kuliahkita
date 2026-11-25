@@ -12,6 +12,8 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
 </head>
 <body class="bg-zinc-50 text-zinc-900 min-h-screen flex overflow-x-hidden">
 
@@ -394,5 +396,101 @@
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/board.js"></script>
+  <!-- Tombol mengambang di pojok kanan bawah untuk memutar ulang panduan saat demo -->
+<button onclick="mulaiTurPanduan()" style="position:fixed; bottom:20px; right:20px; z-index:999; background:#111827; color:#fff; border:none; padding:10px 16px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+  ❓ Panduan Fitur
+</button>
+
+<script>
+  function mulaiTurPanduan() {
+    const driver = window.driver.js.driver;
+
+    // Cari elemen otomatis berdasarkan teks agar tidak perlu ubah ID HTML yang sudah ada
+    const cariElemen = (selector, teks) => {
+      return Array.from(document.querySelectorAll(selector)).find(el => el.textContent.includes(teks));
+    };
+
+    const driverObj = driver({
+      showProgress: true,
+      nextBtnText: 'Lanjut →',
+      prevBtnText: '← Kembali',
+      doneBtnText: 'Selesai & Mulai!',
+      steps: [
+        {
+          popover: {
+            title: '👋 Selamat Datang di KuliahKita!',
+            description: 'Mari kenali fitur utama ruang kerja kelompok Anda dalam 30 detik agar kolaborasi tugas makin rapi.'
+          }
+        },
+        {
+          element: cariElemen('div, section, aside > div', 'BOT PENGINGAT WA'),
+          popover: {
+            title: '🤖 1. Tautkan ke Grup WhatsApp',
+            description: 'Salin perintah <b>!daftar</b> ini lalu kirim ke grup WhatsApp kelompok Anda. Bot akan otomatis mengirim pengingat deadline setiap pukul 07.00 & 19.00 WIB!',
+            side: 'right',
+            align: 'start'
+          }
+        },
+        {
+          element: cariElemen('div, section', 'RUANG KAMU'),
+          popover: {
+            title: '🏫 2. Kelola Ruang & Kode Kelas',
+            description: 'Anda bisa berpindah antar-mata kuliah atau membuat ruang kelompok baru (+ Baru) dan membagikan kode ruangnya ke anggota tim.',
+            side: 'right',
+            align: 'start'
+          }
+        },
+        {
+          element: cariElemen('button', 'Tambah Tugas'),
+          popover: {
+            title: '➕ 3. Tambah Tugas Baru',
+            description: 'Klik tombol ini untuk mencatat tugas baru, menentukan tenggat waktu (deadline), dan menunjuk Penanggung Jawab (PJ).',
+            side: 'bottom',
+            align: 'end'
+          }
+        },
+        {
+          element: cariElemen('div, section', 'PROGRES PENYELESAIAN RUANG'),
+          popover: {
+            title: '📊 4. Pantau Progres Kelompok',
+            description: 'Persentase penyelesaian tugas kelompok dan indikator tugas mendesak (< 48 jam) terpantau otomatis di sini.',
+            side: 'bottom',
+            align: 'center'
+          }
+        },
+        {
+          element: cariElemen('div', 'TO DO'),
+          popover: {
+            title: '📋 5. Papan Status (Kanban Board)',
+            description: 'Geser atau ubah status tugas dari <b>TO DO</b> $\\rightarrow$ <b>DIKERJAKAN</b> $\\rightarrow$ <b>CEK BUKTI</b> hingga <b>SELESAI</b> agar seluruh tim tahu progres masing-masing.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: cariElemen('button', 'Simulasi Upgrade Pro'),
+          popover: {
+            title: '💎 6. Model Bisnis (Freemium)',
+            description: 'Pengguna bisa mencoba fitur Pro (pengingat H-3 & H-4 jam serta bebas iklan footer WA) hanya Rp15rb/semester.',
+            side: 'top',
+            align: 'start'
+          }
+        }
+      ]
+    });
+
+    driverObj.drive();
+  }
+
+  // Otomatis jalan saat pengguna pertama kali masuk ke dashboard
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!localStorage.getItem('kuliahkita_tour_done')) {
+      setTimeout(() => {
+        mulaiTurPanduan();
+        localStorage.setItem('kuliahkita_tour_done', 'true');
+      }, 600);
+    }
+  });
+</script>
 </body>
 </html>
