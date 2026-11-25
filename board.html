@@ -13,7 +13,123 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
-<script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+
+  <style>
+    /* Custom Modal Tur Interaktif Premium */
+    .driver-popover.kk-tour-popover {
+      background: #ffffff;
+      color: #09090b;
+      border-radius: 18px;
+      padding: 20px 22px;
+      box-shadow: 0 24px 48px -12px rgba(9, 9, 11, 0.3), 0 0 0 1px rgba(9, 9, 11, 0.08);
+      max-width: 375px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      animation: kkTourPop 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes kkTourPop {
+      from { opacity: 0; transform: translateY(8px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .kk-tour-popover .kk-badge {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4f46e5;
+      margin-bottom: 8px;
+    }
+
+    .kk-tour-popover .driver-popover-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #09090b;
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .kk-tour-popover .driver-popover-description {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #52525b;
+    }
+
+    .kk-tour-popover .kk-tip {
+      margin-top: 10px;
+      padding: 8px 11px;
+      background: #fafafa;
+      border-left: 3px solid #4f46e5;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #3f3f46;
+    }
+
+    .kk-tour-popover .driver-popover-footer {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #f4f4f5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kk-tour-popover .driver-popover-progress-text {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #a1a1aa;
+    }
+
+    .kk-tour-popover .driver-popover-navigation-btns {
+      gap: 6px;
+    }
+
+    .kk-tour-popover .driver-popover-prev-btn {
+      background: #f4f4f5;
+      color: #3f3f46;
+      border: none;
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-shadow: none;
+      transition: all 0.15s;
+    }
+
+    .kk-tour-popover .driver-popover-prev-btn:hover {
+      background: #e4e4e7;
+    }
+
+    .kk-tour-popover .driver-popover-next-btn,
+    .kk-tour-popover .driver-popover-done-btn {
+      background: #09090b;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      text-shadow: none;
+      transition: all 0.15s;
+    }
+
+    .kk-tour-popover .driver-popover-next-btn:hover,
+    .kk-tour-popover .driver-popover-done-btn:hover {
+      background: #4f46e5;
+    }
+
+    .kk-tour-popover .driver-popover-close-btn {
+      color: #a1a1aa;
+      font-size: 18px;
+      top: 14px;
+      right: 14px;
+    }
+  </style>
 </head>
 <body class="bg-zinc-50 text-zinc-900 min-h-screen flex overflow-x-hidden">
 
@@ -63,7 +179,7 @@
       </div>
 
       <!-- Pindah Ruang Cepat (Riwayat) -->
-      <div>
+      <div id="tour-workspaces-section">
         <div class="flex items-center justify-between px-1 mb-2">
           <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Ruang Kamu</span>
           <a href="auth.html?tab=create" class="text-[11px] font-bold text-indigo-600 hover:underline">+ Baru</a>
@@ -72,7 +188,7 @@
       </div>
 
       <!-- Anggota Terlibat di Papan Ini -->
-      <div>
+      <div id="tour-members-section">
         <div class="px-1 mb-2">
           <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Anggota & PJ Aktif</span>
         </div>
@@ -94,7 +210,7 @@
       </div>
 
       <!-- Profil User Interaktif + Tombol Keluar Jelas -->
-      <div class="relative pt-1">
+      <div id="tour-user-profile" class="relative pt-1">
         <!-- Popover Menu User (Muncul saat profil diklik) -->
         <div id="user-menu-popover" class="hidden mb-2 p-2.5 bg-white border border-zinc-200 rounded-xl shadow-lg space-y-1">
           <div class="px-2 py-1.5 border-b border-zinc-100">
@@ -131,6 +247,7 @@
           </button>
         </div>
       </div>
+    </div>
   </aside>
 
   <!-- =========================================================
@@ -147,7 +264,7 @@
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <h1 id="ws-title" class="text-base sm:text-lg font-extrabold text-zinc-950 tracking-tight truncate">Memuat Ruang...</h1>
-              <button onclick="copyWorkspaceCode()" title="Salin Kode Ruang"
+              <button id="tour-copy-code-btn" onclick="copyWorkspaceCode()" title="Salin Kode Ruang"
                 class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-mono text-xs font-bold transition cursor-pointer">
                 <span id="ws-code-badge">---</span>
                 <i data-lucide="copy" class="w-3 h-3"></i>
@@ -159,7 +276,14 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="openTaskModal()"
+          <!-- Tombol Putar Ulang Panduan Interaktif -->
+          <button onclick="mulaiTurPanduan()" title="Mulai Panduan Interaktif"
+            class="bg-white hover:bg-zinc-100 text-zinc-700 border border-zinc-200 px-3 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-600"></i>
+            <span class="hidden sm:inline">Panduan</span>
+          </button>
+
+          <button id="tour-add-task-btn" onclick="openTaskModal()"
             class="bg-zinc-950 hover:bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shadow-xs transition cursor-pointer">
             <i data-lucide="plus" class="w-4 h-4"></i>
             <span>Tambah Tugas</span>
@@ -172,7 +296,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 space-y-5">
 
       <!-- Progress Bar & Ringkasan Statistik Ruang -->
-      <section class="bg-white border border-zinc-200/90 rounded-2xl p-4 shadow-2xs">
+      <section id="tour-progress-section" class="bg-white border border-zinc-200/90 rounded-2xl p-4 shadow-2xs">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <div>
             <div class="flex items-center gap-2">
@@ -207,7 +331,7 @@
       <!-- Toolbar: Quick Filter, Search & Dual View Toggle -->
       <section class="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <!-- Quick Filter Pills -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+        <div id="tour-filter-group" class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
           <button onclick="setTaskFilter('all')" id="filter-all"
             class="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-950 text-white transition cursor-pointer shrink-0">
             Semua Tugas
@@ -225,7 +349,7 @@
         </div>
 
         <!-- Search & View Switcher -->
-        <div class="flex items-center gap-2">
+        <div id="tour-search-view-group" class="flex items-center gap-2">
           <div class="relative flex-1 sm:w-56">
             <i data-lucide="search" class="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
             <input type="text" id="search-task-input" oninput="renderBoard()" placeholder="Cari tugas atau nama PJ..."
@@ -251,7 +375,7 @@
       <!-- VIEW A: PAPAN KANBAN (4 KOLOM) -->
       <section id="kanban-view" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
         <!-- Kolom 1: To Do -->
-        <div class="bg-zinc-100/80 border border-zinc-200/70 rounded-2xl p-3.5">
+        <div id="tour-col-todo" class="bg-zinc-100/80 border border-zinc-200/70 rounded-2xl p-3.5">
           <div class="flex items-center justify-between mb-3 px-1">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
@@ -263,7 +387,7 @@
         </div>
 
         <!-- Kolom 2: Dikerjakan -->
-        <div class="bg-indigo-50/40 border border-indigo-100 rounded-2xl p-3.5">
+        <div id="tour-col-progress" class="bg-indigo-50/40 border border-indigo-100 rounded-2xl p-3.5">
           <div class="flex items-center justify-between mb-3 px-1">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
@@ -275,7 +399,7 @@
         </div>
 
         <!-- Kolom 3: Cek Bukti -->
-        <div class="bg-amber-50/40 border border-amber-100 rounded-2xl p-3.5">
+        <div id="tour-col-review" class="bg-amber-50/40 border border-amber-100 rounded-2xl p-3.5">
           <div class="flex items-center justify-between mb-3 px-1">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
@@ -287,7 +411,7 @@
         </div>
 
         <!-- Kolom 4: Selesai (ACC) -->
-        <div class="bg-emerald-50/40 border border-emerald-100 rounded-2xl p-3.5">
+        <div id="tour-col-done" class="bg-emerald-50/40 border border-emerald-100 rounded-2xl p-3.5">
           <div class="flex items-center justify-between mb-3 px-1">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
@@ -396,101 +520,155 @@
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/board.js"></script>
-  <!-- Tombol mengambang di pojok kanan bawah untuk memutar ulang panduan saat demo -->
-<button onclick="mulaiTurPanduan()" style="position:fixed; bottom:20px; right:20px; z-index:999; background:#111827; color:#fff; border:none; padding:10px 16px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-  ❓ Panduan Fitur
-</button>
 
-<script>
-  function mulaiTurPanduan() {
-    const driver = window.driver.js.driver;
+  <!-- =========================================================
+       INTERACTIVE PRODUCT TOUR v2 (FIX BADGE HTML DI DESCRIPTION)
+       ========================================================= -->
+  <script>
+    function mulaiTurPanduan() {
+      if (!window.driver || !window.driver.js) return;
 
-    // Cari elemen otomatis berdasarkan teks agar tidak perlu ubah ID HTML yang sudah ada
-    const cariElemen = (selector, teks) => {
-      return Array.from(document.querySelectorAll(selector)).find(el => el.textContent.includes(teks));
-    };
+      if (window.innerWidth < 1024 && typeof toggleSidebar === 'function') {
+        toggleSidebar(true);
+      }
 
-    const driverObj = driver({
-      showProgress: true,
-      nextBtnText: 'Lanjut →',
-      prevBtnText: '← Kembali',
-      doneBtnText: 'Selesai & Mulai!',
-      steps: [
+      const driver = window.driver.js.driver;
+
+      const steps = [
         {
           popover: {
             title: '👋 Selamat Datang di KuliahKita!',
-            description: 'Mari kenali fitur utama ruang kerja kelompok Anda dalam 30 detik agar kolaborasi tugas makin rapi.'
+            description: '<span class="kk-badge">Tur Interaktif • 11 Fitur</span><br>Workspace kolaborasi tugas mahasiswa yang terhubung langsung dengan <b>Bot Pengingat WhatsApp</b>. Yuk kenali cara kerja seluruh tombol dan fitur di layar ini!'
           }
         },
         {
-          element: cariElemen('div, section, aside > div', 'BOT PENGINGAT WA'),
+          element: '#tour-copy-code-btn',
           popover: {
-            title: '🤖 1. Tautkan ke Grup WhatsApp',
-            description: 'Salin perintah <b>!daftar</b> ini lalu kirim ke grup WhatsApp kelompok Anda. Bot akan otomatis mengirim pengingat deadline setiap pukul 07.00 & 19.00 WIB!',
-            side: 'right',
+            title: '🔑 Salin Kode Ruang Kelompok',
+            description: '<span class="kk-badge">1. Undang Anggota</span><br>Klik tombol kode ini untuk menyalin <b>Kode Ruang</b> (contoh: <code>KK-BBEW</code>), lalu bagikan ke teman kelompok agar mereka bisa masuk ke papan yang sama.',
+            side: 'bottom',
             align: 'start'
           }
         },
         {
-          element: cariElemen('div, section', 'RUANG KAMU'),
+          element: '#tour-add-task-btn',
           popover: {
-            title: '🏫 2. Kelola Ruang & Kode Kelas',
-            description: 'Anda bisa berpindah antar-mata kuliah atau membuat ruang kelompok baru (+ Baru) dan membagikan kode ruangnya ke anggota tim.',
-            side: 'right',
-            align: 'start'
-          }
-        },
-        {
-          element: cariElemen('button', 'Tambah Tugas'),
-          popover: {
-            title: '➕ 3. Tambah Tugas Baru',
-            description: 'Klik tombol ini untuk mencatat tugas baru, menentukan tenggat waktu (deadline), dan menunjuk Penanggung Jawab (PJ).',
+            title: '➕ Buat & Tugaskan Pekerjaan',
+            description: '<span class="kk-badge">2. Aksi Utama</span><br>Klik tombol ini untuk mencatat tugas baru, menentukan <b>Penanggung Jawab (PJ)</b>, nomor WhatsApp PJ, serta batas waktu (deadline).<div class="kk-tip">💡 Setiap tugas baru otomatis masuk ke jadwal pengingat WhatsApp!</div>',
             side: 'bottom',
             align: 'end'
           }
         },
         {
-          element: cariElemen('div, section', 'PROGRES PENYELESAIAN RUANG'),
+          element: '#wa-status-card',
           popover: {
-            title: '📊 4. Pantau Progres Kelompok',
-            description: 'Persentase penyelesaian tugas kelompok dan indikator tugas mendesak (< 48 jam) terpantau otomatis di sini.',
+            title: '🤖 Tautkan Bot Pengingat ke Grup WA',
+            description: '<span class="kk-badge">3. Integrasi WhatsApp</span><br>Klik <b>Salin</b> pada perintah <code>!daftar</code> ini lalu kirim ke grup WhatsApp kelompokmu. Bot akan otomatis mengirim pengingat deadline tiap jam <b>07.00 & 19.00 WIB</b>.',
+            side: 'right',
+            align: 'start'
+          }
+        },
+        {
+          element: '#tour-workspaces-section',
+          popover: {
+            title: '🏫 Pindah & Buat Ruang Baru',
+            description: '<span class="kk-badge">4. Multi-Ruang</span><br>Berpindah antar-ruang mata kuliah atau proyek PBL dengan satu klik, atau tekan <b>+ Baru</b> untuk membuat ruang kerja kelompok baru.',
+            side: 'right',
+            align: 'start'
+          }
+        },
+        {
+          element: '#tour-members-section',
+          popover: {
+            title: '👥 Anggota & PJ Aktif',
+            description: '<span class="kk-badge">5. Tim & PJ</span><br>Menampilkan seluruh anggota tim yang terlibat beserta Penanggung Jawab (PJ) aktif di ruang kerja ini.',
+            side: 'right',
+            align: 'start'
+          }
+        },
+        {
+          element: '#tour-progress-section',
+          popover: {
+            title: '📊 Progres & Radar Tugas Mendesak',
+            description: '<span class="kk-badge">6. Monitoring Real-Time</span><br>Pantau persentase penyelesaian tugas kelompok secara otomatis, lengkap dengan penghitung tugas <b>Aktif</b>, <b>Cek Bukti</b>, dan <b>Mendesak (&lt; 48 Jam)</b>.',
             side: 'bottom',
             align: 'center'
           }
         },
         {
-          element: cariElemen('div', 'TO DO'),
+          element: '#tour-filter-group',
           popover: {
-            title: '📋 5. Papan Status (Kanban Board)',
-            description: 'Geser atau ubah status tugas dari <b>TO DO</b> $\\rightarrow$ <b>DIKERJAKAN</b> $\\rightarrow$ <b>CEK BUKTI</b> hingga <b>SELESAI</b> agar seluruh tim tahu progres masing-masing.',
+            title: '🎯 Saring Tugas Pribadi & Mendesak',
+            description: '<span class="kk-badge">7. Filter Cepat</span><br>Gunakan filter ini untuk melihat <b>Semua Tugas</b> tim, fokus pada <b>Tugas Saya</b> saja, atau mengecek tugas dengan deadline mepet (<b>&lt; 48 Jam</b>).',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#tour-search-view-group',
+          popover: {
+            title: '🔍 Cari Tugas & Mode Papan/Daftar',
+            description: '<span class="kk-badge">8. Pencarian & Tampilan</span><br>Cari tugas berdasarkan judul atau nama PJ, serta ganti tampilan antara mode visual <b>Papan (Kanban)</b> dan <b>Daftar (Timeline Tenggat)</b>.',
+            side: 'bottom',
+            align: 'end'
+          }
+        },
+        {
+          element: '#kanban-view',
+          popover: {
+            title: '📋 Kanban Board & Validasi Bukti',
+            description: '<span class="kk-badge">9. Alur Kerja 4 Tahap</span><br>Setiap tugas bergerak melalui 4 kolom status: <b>To Do</b> &rarr; <b>Dikerjakan</b> &rarr; <b>Cek Bukti</b> (anggota menyetor link GDrive/Docs untuk diperiksa ketua) &rarr; <b>Selesai</b>.',
             side: 'top',
             align: 'center'
           }
         },
         {
-          element: cariElemen('button', 'Simulasi Upgrade Pro'),
+          element: '#plan-upgrade-box',
           popover: {
-            title: '💎 6. Model Bisnis (Freemium)',
-            description: 'Pengguna bisa mencoba fitur Pro (pengingat H-3 & H-4 jam serta bebas iklan footer WA) hanya Rp15rb/semester.',
+            title: '💎 Fitur Pengingat Ekstra & Tanpa Iklan',
+            description: '<span class="kk-badge">10. Paket Pro • Rp15rb/smt</span><br>Klik <b>Simulasi Upgrade Pro</b> untuk mencoba fitur premium: menghapus footer iklan di pesan bot WhatsApp serta mengaktifkan pengingat otomatis <b>H-3 hari</b> dan <b>H-4 jam</b> sebelum deadline!',
+            side: 'top',
+            align: 'start'
+          }
+        },
+        {
+          element: '#tour-user-profile',
+          popover: {
+            title: '👤 Profil, Ganti Ruang & Keluar',
+            description: '<span class="kk-badge">11. Akun & Sesi</span><br>Klik namamu untuk mengganti identitas atau berpindah ruang dengan cepat, atau klik tombol <b>Keluar</b> untuk mengakhiri sesi dengan aman.',
             side: 'top',
             align: 'start'
           }
         }
-      ]
-    });
+      ];
 
-    driverObj.drive();
-  }
+      const driverObj = driver({
+        showProgress: true,
+        animate: true,
+        smoothScroll: true,
+        allowClose: true,
+        overlayColor: 'rgba(9, 9, 11, 0.65)',
+        stagePadding: 8,
+        stageRadius: 14,
+        popoverClass: 'kk-tour-popover',
+        progressText: 'Langkah {{current}} dari {{total}}',
+        nextBtnText: 'Lanjut →',
+        prevBtnText: '← Kembali',
+        doneBtnText: '🎉 Selesai & Mulai!',
+        steps: steps
+      });
 
-  // Otomatis jalan saat pengguna pertama kali masuk ke dashboard
-  window.addEventListener('DOMContentLoaded', () => {
-    if (!localStorage.getItem('kuliahkita_tour_done')) {
-      setTimeout(() => {
-        mulaiTurPanduan();
-        localStorage.setItem('kuliahkita_tour_done', 'true');
-      }, 600);
+      driverObj.drive();
     }
-  });
-</script>
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!localStorage.getItem('kuliahkita_tour_v2_done')) {
+        setTimeout(() => {
+          mulaiTurPanduan();
+          localStorage.setItem('kuliahkita_tour_v2_done', 'true');
+        }, 700);
+      }
+    });
+  </script>
 </body>
 </html>
