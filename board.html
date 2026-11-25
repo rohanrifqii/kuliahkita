@@ -129,6 +129,24 @@
       top: 14px;
       right: 14px;
     }
+
+    @media (max-width: 640px) {
+    .driver-popover.kk-tour-popover {
+    max-width: calc(100vw - 28px) !important;
+    padding: 16px 18px;
+    border-radius: 16px;
+    }
+    .kk-tour-popover .driver-popover-title {
+    font-size: 15px;
+    }
+    .kk-tour-popover .driver-popover-description {
+    font-size: 12.5px;
+    }
+    .kk-tour-popover .driver-popover-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+    }
+  }
   </style>
 </head>
 <body class="bg-zinc-50 text-zinc-900 min-h-screen flex overflow-x-hidden">
@@ -524,18 +542,45 @@
   <!-- =========================================================
        INTERACTIVE PRODUCT TOUR v2 (FIX BADGE HTML DI DESCRIPTION)
        ========================================================= -->
+  <style>
+    @media (max-width: 640px) {
+      .driver-popover.kk-tour-popover {
+        max-width: calc(100vw - 28px) !important;
+        padding: 16px 18px;
+        border-radius: 16px;
+      }
+      .kk-tour-popover .driver-popover-title {
+        font-size: 15px;
+      }
+      .kk-tour-popover .driver-popover-description {
+        font-size: 12.5px;
+      }
+      .kk-tour-popover .driver-popover-footer {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+    }
+  </style>
+
   <script>
+    function aturSidebarMobile(buka) {
+      if (window.innerWidth < 1024 && typeof toggleSidebar === 'function') {
+        toggleSidebar(buka);
+      }
+    }
+
     function mulaiTurPanduan() {
       if (!window.driver || !window.driver.js) return;
 
-      if (window.innerWidth < 1024 && typeof toggleSidebar === 'function') {
-        toggleSidebar(true);
-      }
-
+      const isMobile = window.innerWidth < 1024;
       const driver = window.driver.js.driver;
+
+      // Pastikan mulai dalam kondisi sidebar tertutup di mobile
+      aturSidebarMobile(false);
 
       const steps = [
         {
+          onHighlightStarted: () => aturSidebarMobile(false),
           popover: {
             title: '👋 Selamat Datang di KuliahKita!',
             description: '<span class="kk-badge">Tur Interaktif • 11 Fitur</span><br>Workspace kolaborasi tugas mahasiswa yang terhubung langsung dengan <b>Bot Pengingat WhatsApp</b>. Yuk kenali cara kerja seluruh tombol dan fitur di layar ini!'
@@ -543,6 +588,7 @@
         },
         {
           element: '#tour-copy-code-btn',
+          onHighlightStarted: () => aturSidebarMobile(false),
           popover: {
             title: '🔑 Salin Kode Ruang Kelompok',
             description: '<span class="kk-badge">1. Undang Anggota</span><br>Klik tombol kode ini untuk menyalin <b>Kode Ruang</b> (contoh: <code>KK-BBEW</code>), lalu bagikan ke teman kelompok agar mereka bisa masuk ke papan yang sama.',
@@ -552,6 +598,7 @@
         },
         {
           element: '#tour-add-task-btn',
+          onHighlightStarted: () => aturSidebarMobile(false),
           popover: {
             title: '➕ Buat & Tugaskan Pekerjaan',
             description: '<span class="kk-badge">2. Aksi Utama</span><br>Klik tombol ini untuk mencatat tugas baru, menentukan <b>Penanggung Jawab (PJ)</b>, nomor WhatsApp PJ, serta batas waktu (deadline).<div class="kk-tip">💡 Setiap tugas baru otomatis masuk ke jadwal pengingat WhatsApp!</div>',
@@ -561,83 +608,92 @@
         },
         {
           element: '#wa-status-card',
+          onHighlightStarted: () => aturSidebarMobile(true),
           popover: {
             title: '🤖 Tautkan Bot Pengingat ke Grup WA',
             description: '<span class="kk-badge">3. Integrasi WhatsApp</span><br>Klik <b>Salin</b> pada perintah <code>!daftar</code> ini lalu kirim ke grup WhatsApp kelompokmu. Bot akan otomatis mengirim pengingat deadline tiap jam <b>07.00 & 19.00 WIB</b>.',
-            side: 'right',
+            side: isMobile ? 'bottom' : 'right',
             align: 'start'
           }
         },
         {
           element: '#tour-workspaces-section',
+          onHighlightStarted: () => aturSidebarMobile(true),
           popover: {
             title: '🏫 Pindah & Buat Ruang Baru',
             description: '<span class="kk-badge">4. Multi-Ruang</span><br>Berpindah antar-ruang mata kuliah atau proyek PBL dengan satu klik, atau tekan <b>+ Baru</b> untuk membuat ruang kerja kelompok baru.',
-            side: 'right',
+            side: isMobile ? 'bottom' : 'right',
             align: 'start'
           }
         },
         {
           element: '#tour-members-section',
+          onHighlightStarted: () => aturSidebarMobile(true),
           popover: {
             title: '👥 Anggota & PJ Aktif',
             description: '<span class="kk-badge">5. Tim & PJ</span><br>Menampilkan seluruh anggota tim yang terlibat beserta Penanggung Jawab (PJ) aktif di ruang kerja ini.',
-            side: 'right',
+            side: isMobile ? 'bottom' : 'right',
+            align: 'start'
+          }
+        },
+        {
+          element: '#plan-upgrade-box',
+          onHighlightStarted: () => aturSidebarMobile(true),
+          popover: {
+            title: '💎 Fitur Pengingat Ekstra & Tanpa Iklan',
+            description: '<span class="kk-badge">6. Paket Pro • Rp15rb/smt</span><br>Klik <b>Simulasi Upgrade Pro</b> untuk mencoba fitur premium: menghapus footer iklan di pesan bot WhatsApp serta mengaktifkan pengingat otomatis <b>H-3 hari</b> dan <b>H-4 jam</b> sebelum deadline!',
+            side: isMobile ? 'top' : 'right',
+            align: 'start'
+          }
+        },
+        {
+          element: '#tour-user-profile',
+          onHighlightStarted: () => aturSidebarMobile(true),
+          popover: {
+            title: '👤 Profil, Ganti Ruang & Keluar',
+            description: '<span class="kk-badge">7. Akun & Sesi</span><br>Klik namamu untuk mengganti identitas atau berpindah ruang dengan cepat, atau klik tombol <b>Keluar</b> untuk mengakhiri sesi dengan aman.',
+            side: isMobile ? 'top' : 'right',
             align: 'start'
           }
         },
         {
           element: '#tour-progress-section',
+          onHighlightStarted: () => aturSidebarMobile(false),
           popover: {
             title: '📊 Progres & Radar Tugas Mendesak',
-            description: '<span class="kk-badge">6. Monitoring Real-Time</span><br>Pantau persentase penyelesaian tugas kelompok secara otomatis, lengkap dengan penghitung tugas <b>Aktif</b>, <b>Cek Bukti</b>, dan <b>Mendesak (&lt; 48 Jam)</b>.',
+            description: '<span class="kk-badge">8. Monitoring Real-Time</span><br>Pantau persentase penyelesaian tugas kelompok secara otomatis, lengkap dengan penghitung tugas <b>Aktif</b>, <b>Cek Bukti</b>, dan <b>Mendesak (&lt; 48 Jam)</b>.',
             side: 'bottom',
             align: 'center'
           }
         },
         {
           element: '#tour-filter-group',
+          onHighlightStarted: () => aturSidebarMobile(false),
           popover: {
             title: '🎯 Saring Tugas Pribadi & Mendesak',
-            description: '<span class="kk-badge">7. Filter Cepat</span><br>Gunakan filter ini untuk melihat <b>Semua Tugas</b> tim, fokus pada <b>Tugas Saya</b> saja, atau mengecek tugas dengan deadline mepet (<b>&lt; 48 Jam</b>).',
+            description: '<span class="kk-badge">9. Filter Cepat</span><br>Gunakan filter ini untuk melihat <b>Semua Tugas</b> tim, fokus pada <b>Tugas Saya</b> saja, atau mengecek tugas dengan deadline mepet (<b>&lt; 48 Jam</b>).',
             side: 'bottom',
             align: 'start'
           }
         },
         {
           element: '#tour-search-view-group',
+          onHighlightStarted: () => aturSidebarMobile(false),
           popover: {
             title: '🔍 Cari Tugas & Mode Papan/Daftar',
-            description: '<span class="kk-badge">8. Pencarian & Tampilan</span><br>Cari tugas berdasarkan judul atau nama PJ, serta ganti tampilan antara mode visual <b>Papan (Kanban)</b> dan <b>Daftar (Timeline Tenggat)</b>.',
+            description: '<span class="kk-badge">10. Pencarian & Tampilan</span><br>Cari tugas berdasarkan judul atau nama PJ, serta ganti tampilan antara mode visual <b>Papan (Kanban)</b> dan <b>Daftar (Timeline Tenggat)</b>.',
             side: 'bottom',
             align: 'end'
           }
         },
         {
           element: '#kanban-view',
+          onHighlightStarted: () => aturSidebarMobile(false),
           popover: {
             title: '📋 Kanban Board & Validasi Bukti',
-            description: '<span class="kk-badge">9. Alur Kerja 4 Tahap</span><br>Setiap tugas bergerak melalui 4 kolom status: <b>To Do</b> &rarr; <b>Dikerjakan</b> &rarr; <b>Cek Bukti</b> (anggota menyetor link GDrive/Docs untuk diperiksa ketua) &rarr; <b>Selesai</b>.',
+            description: '<span class="kk-badge">11. Alur Kerja 4 Tahap</span><br>Setiap tugas bergerak melalui 4 kolom status: <b>To Do</b> &rarr; <b>Dikerjakan</b> &rarr; <b>Cek Bukti</b> (anggota menyetor link GDrive/Docs untuk diperiksa ketua) &rarr; <b>Selesai</b>.',
             side: 'top',
             align: 'center'
-          }
-        },
-        {
-          element: '#plan-upgrade-box',
-          popover: {
-            title: '💎 Fitur Pengingat Ekstra & Tanpa Iklan',
-            description: '<span class="kk-badge">10. Paket Pro • Rp15rb/smt</span><br>Klik <b>Simulasi Upgrade Pro</b> untuk mencoba fitur premium: menghapus footer iklan di pesan bot WhatsApp serta mengaktifkan pengingat otomatis <b>H-3 hari</b> dan <b>H-4 jam</b> sebelum deadline!',
-            side: 'top',
-            align: 'start'
-          }
-        },
-        {
-          element: '#tour-user-profile',
-          popover: {
-            title: '👤 Profil, Ganti Ruang & Keluar',
-            description: '<span class="kk-badge">11. Akun & Sesi</span><br>Klik namamu untuk mengganti identitas atau berpindah ruang dengan cepat, atau klik tombol <b>Keluar</b> untuk mengakhiri sesi dengan aman.',
-            side: 'top',
-            align: 'start'
           }
         }
       ];
@@ -648,13 +704,17 @@
         smoothScroll: true,
         allowClose: true,
         overlayColor: 'rgba(9, 9, 11, 0.65)',
-        stagePadding: 8,
+        stagePadding: isMobile ? 5 : 8,
         stageRadius: 14,
         popoverClass: 'kk-tour-popover',
         progressText: 'Langkah {{current}} dari {{total}}',
         nextBtnText: 'Lanjut →',
         prevBtnText: '← Kembali',
         doneBtnText: '🎉 Selesai & Mulai!',
+        onDestroyStarted: () => {
+          aturSidebarMobile(false);
+          driverObj.destroy();
+        },
         steps: steps
       });
 
@@ -662,10 +722,10 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      if (!localStorage.getItem('kuliahkita_tour_v2_done')) {
+      if (!localStorage.getItem('kuliahkita_tour_v3_done')) {
         setTimeout(() => {
           mulaiTurPanduan();
-          localStorage.setItem('kuliahkita_tour_v2_done', 'true');
+          localStorage.setItem('kuliahkita_tour_v3_done', 'true');
         }, 700);
       }
     });
